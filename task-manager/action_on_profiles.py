@@ -4,6 +4,7 @@ from pathlib import Path
 def get_file(name):
     main_folder = Path(__file__).resolve().parent.parent
     user_folder = main_folder / "user-data"
+    user_folder.mkdir(exist_ok=True)
     file = user_folder / f"{name}.json"
     return file
 
@@ -20,7 +21,6 @@ def create_profile(users_file):
         except FileExistsError:
             print("User already exists. Please choose a different username.")
     
-
     while True:
         password = input("Password: ")
         confirm_password = input("Confirm password: ")
@@ -42,5 +42,28 @@ def create_profile(users_file):
     users_data.append(user_data)
 
     with open(users_file, "w") as f:
-        json.dump(users_data, f)      
+        json.dump(users_data, f, indent=2)      
+    
+    print("Profile has been created.")
+    return user_data 
+
+
+def choose_profile(users_file):
+    print("Choose one profile from the following.")
+    with open(users_file, "r") as f:
+        profile_list = json.load(f)
+    profile_names = []
+    
+    for user in profile_list:
+        profile_names.append(user["username"])
+    print(" ".join(profile_names))
+    
+    while True:
+        try:
+            profile = input("Choice: ")
+            if profile not in profile_names:
+                raise NameError
+            break
+        except NameError:
+            print(f"{profile} does not exist. Try again.")
     
