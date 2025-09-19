@@ -3,7 +3,7 @@ from pathlib import Path
 
 def get_file(name):
     main_folder = Path(__file__).resolve().parent.parent
-    user_folder = main_folder / "user-data"
+    user_folder = main_folder / "user_data"
     user_folder.mkdir(exist_ok=True)
     file = user_folder / f"{name}.json"
     return file
@@ -13,14 +13,18 @@ def create_profile(users_file):
     print("Enter your login details to create a new profile.")
     while True:
         try:
-            username = input("Username: ")
+            username = input("Username: ").strip()
+            if username == "" or len(username) < 3:
+                raise NameError
             user_file = get_file(username)
             if user_file.exists():
                 raise FileExistsError
             break
         except FileExistsError:
             print("User already exists. Please choose a different username.")
-    
+        except NameError:
+            print("Username must be at least 3 characters long")
+
     while True:
         password = input("Password: ")
         confirm_password = input("Confirm password: ")

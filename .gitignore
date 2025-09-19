@@ -210,4 +210,4 @@ __marimo__/
 venv/
 
 # user data
-user-data/
+user_data/
