@@ -1,5 +1,5 @@
 from time import sleep
-from action_on_profiles import create_profile, get_file, choose_profile
+from action_on_profiles import create_profile, get_file, log_into_profile
 
 def main():
     def action(users_file):
@@ -9,7 +9,7 @@ def main():
             if decision == "create":
                 user_data = create_profile(users_file)
             elif decision == "choose":
-                choose_profile(users_file)
+                log_into_profile(users_file)
             else:
                 print("Try again")
     
