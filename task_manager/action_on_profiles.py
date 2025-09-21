@@ -52,22 +52,34 @@ def create_profile(users_file):
     return user_data 
 
 
-def choose_profile(users_file):
+def log_into_profile(users_file):
     print("Choose one profile from the following.")
     with open(users_file, "r") as f:
         profile_list = json.load(f)
-    profile_names = []
     
+    profile_names = []
     for user in profile_list:
         profile_names.append(user["username"])
     print(" ".join(profile_names))
     
     while True:
         try:
-            profile = input("Choice: ")
-            if profile not in profile_names:
+            username = input("User: ").strip()
+            if username not in profile_names:
                 raise NameError
+            
+            for user in profile_list:
+                if user["username"] == username:
+                    user_data = user
+            
+            password = input("Password: ").strip()
+            if password != user_data["password"]:
+                raise PermissionError
             break
         except NameError:
-            print(f"{profile} does not exist. Try again.")
-    
+            print("User does not exist. Try again.")
+        except PermissionError:
+            print("Wrong password. Try again")
+    return user_data
+
+            
