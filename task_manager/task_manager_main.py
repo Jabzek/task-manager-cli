@@ -6,7 +6,7 @@ from action_on_profiles import create_profile, get_file, log_into_profile
 
 
 def managing_account(user_data):
-    username, password, file = user_data.values()
+    username = user_data["username"]
     print(f"Welcome {username}!!!")
     while True: 
         user_action = input("What do you want to do: ").strip()
@@ -19,6 +19,10 @@ def managing_account(user_data):
                 print("Logging out of your profile.")
                 exit = False
                 break
+            case "delete":
+                # exit = delete_account(user_data)
+                break
+                
     return exit
 
 

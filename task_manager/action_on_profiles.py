@@ -82,4 +82,6 @@ def log_into_profile(users_file):
             print("Wrong password. Try again")
     return user_data
 
-            
+
+def delete_profile():
+    pass
