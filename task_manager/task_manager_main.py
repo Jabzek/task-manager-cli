@@ -1,8 +1,15 @@
 from time import sleep
 from action_on_profiles import create_profile, get_file, log_into_profile
 
-def main():
-    def action(users_file):
+
+def managing_account():
+    pass
+
+
+
+
+
+def action(users_file):
         print("Do you want to create a new profile or choose from existing ones?")
         while True:
             decision = input("Choice: ")
@@ -12,7 +19,9 @@ def main():
                 log_into_profile(users_file)
             else:
                 print("Try again")
-    
+
+
+def main():
     print("Welcome in your Task Manager!")
     sleep(1)
     users_file = get_file("users")
