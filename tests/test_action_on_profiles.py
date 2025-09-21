@@ -155,7 +155,10 @@ def test_log_into_profile_wrong_password(mock_environment, monkeypatch, username
 
 
 def assert_profiles_deleting(user_data, user_file, users_file):
-    assert user_data not in users_file
+    with open(users_file, "r") as f:
+        users_data = json.load(f)
+    
+    assert user_data not in users_data
     assert not user_file.exists()
 
 
@@ -196,7 +199,10 @@ def test_delete_profile_wrong_password(mock_environment, monkeypatch, tmp_path, 
 
 
 def assert_profiles_deleting_cancel(user_data, user_file, users_file):
-    assert user_data in users_file
+    with open(users_file, "r") as f:
+        users_data = json.load(f)
+    
+    assert user_data in users_data
     assert user_file.exists()
 
 
