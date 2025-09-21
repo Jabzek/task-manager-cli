@@ -1,36 +1,59 @@
 from time import sleep
 from action_on_profiles import create_profile, get_file, log_into_profile
 
-
-def managing_account():
-    pass
-
+# To do: Remove account, add task, remove task, show tasks (with filtres), password change, 
+# task status change, task edit, task history, 
 
 
+def managing_account(user_data):
+    username, password, file = user_data.values()
+    print(f"Welcome {username}!!!")
+    while True: 
+        user_action = input("What do you want to do: ").strip()
+        match user_action:
+            case "quit":
+                exit = True
+                print("Exiting from Task Manager.")
+                break
+            case "logout":
+                print("Logging out of your profile.")
+                exit = False
+                break
+    return exit
 
 
 def action(users_file):
-        print("Do you want to create a new profile or choose from existing ones?")
-        while True:
-            decision = input("Choice: ")
-            if decision == "create":
-                user_data = create_profile(users_file)
-            elif decision == "choose":
-                log_into_profile(users_file)
-            else:
-                print("Try again")
+    print("Do you want to create a new profile or choose from existing ones?")
+    while True:
+        decision = input("Choice: ")
+        if decision == "create":
+            user_data = create_profile(users_file)
+            break
+        elif decision == "choose":
+            user_data = log_into_profile(users_file)
+            break
+        else:
+            print("Try again.")
+    exit_program = managing_account(user_data)
+    return exit_program
 
 
 def main():
     print("Welcome in your Task Manager!")
     sleep(1)
     users_file = get_file("users")
+    
     if not users_file.exists():
-        print("Let's create first profile")
+        print("Let's create first profile.")
         sleep(1)
         user_data = create_profile(users_file)
+        exit_program = managing_account(user_data)
     else:
-        action(users_file)
+        exit_program = action(users_file)
+    
+    while not exit_program:
+        exit_program = action(users_file)
+
 
 if __name__ == "__main__":
     main()
