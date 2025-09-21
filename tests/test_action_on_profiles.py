@@ -14,6 +14,20 @@ def mock_environment(monkeypatch, tmp_path):
     return users_file
 
 
+def saving_data_to_file(users_file, tmp_path):
+    file_list = (str(tmp_path / "jacek.json"), str(tmp_path / "leon4jds.json"), str(tmp_path / "ann531.json"),
+                str(tmp_path / "johnus941.json"))
+    data = [{"username": "jacek", "password": "123", "file": file_list[0]},
+            {"username": "leon4jds", "password": "F@BafvLOP", "file": file_list[1]},
+            {"username": "ann531", "password": "hobbit123", "file": file_list[2]},
+            {"username": "johnus941", "password": "arZWksPP", "file": file_list[3]}]
+    with open(users_file, "w") as f:
+        json.dump(data, f)
+
+    for file in file_list:
+        Path(file).touch()
+
+
 def assert_profiles_creation(result, username, password, users_file):
     assert result["username"] == username
     assert result["password"] == password
@@ -47,7 +61,7 @@ def test_create_profile_user_exists(mock_environment, monkeypatch, username1, pa
     users_file = mock_environment
     inputs = [username1, username2, password, password]
     monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
-    Path.touch(tmp_path / f"{username1}.json")
+    (tmp_path / f"{username1}.json").touch()
     result = create_profile(users_file)
     assert_profiles_creation(result, username2, password, users_file)
 
@@ -91,20 +105,9 @@ def test_create_profile_second_user(mock_environment, monkeypatch, username, pas
     assert data[1] == result
 
 
-
-
-def saving_data_to_file(users_file, tmp_path):
-    data = [{"username": "jacek", "password": "123", "file": str(tmp_path / "jacek.json")},
-            {"username": "leon4jds", "password": "F@BafvLOP", "file": str(tmp_path / "leon4jds.json")},
-            {"username": "ann531", "password": "hobbit123", "file": str(tmp_path / "ann531.json")},
-            {"username": "johnus941", "password": "arZWksPP", "file": str(tmp_path / "johnus941.json")}]
-    with open(users_file, "w") as f:
-        json.dump(data, f)
-
-
-def assert_profiles_choosing(username, password, result, tmp_path):
-    assert result == {"username": username, "password": password, "file": str(tmp_path / f"{username}.json")}
-
+def assert_profiles_login(username, password, result, tmp_path):
+    user_data = {"username": username, "password": password, "file": str(tmp_path / f"{username}.json")}
+    assert result == user_data
 
 @pytest.mark.parametrize("username, password", [
     ("jacek", "123"),
@@ -118,7 +121,7 @@ def test_log_into_profile_everything_correct(mock_environment, monkeypatch, user
     inputs = [username, password]
     monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
     result = log_into_profile(users_file)
-    assert_profiles_choosing(username, password, result, tmp_path)
+    assert_profiles_login(username, password, result, tmp_path)
     
 
 @pytest.mark.parametrize("username1, username2, password", [
@@ -133,7 +136,7 @@ def test_log_into_profile_user_does_not_exist(mock_environment, monkeypatch, use
     inputs = [username1, username2, password]
     monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
     result = log_into_profile(users_file)
-    assert_profiles_choosing(username2, password, result, tmp_path)
+    assert_profiles_login(username2, password, result, tmp_path)
 
 
 @pytest.mark.parametrize("username, password1, password2", [
@@ -148,4 +151,45 @@ def test_log_into_profile_wrong_password(mock_environment, monkeypatch, username
     inputs = [username, password1, username, password2]
     monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
     result = log_into_profile(users_file)
-    assert_profiles_choosing(username, password2, result, tmp_path)
+    assert_profiles_login(username, password2, result, tmp_path)
+
+
+def assert_profiles_deleting(user_data, user_file, users_file):
+    assert user_data not in users_file
+    assert not user_file.exists()
+
+
+@pytest.mark.parametrize("username, password, decision", [
+    ("jacek", "123", "yes"),
+    ("leon4jds", "F@BafvLOP", "yes"),
+    ("ann531", "hobbit123", "yes"),
+    ("johnus941", "arZWksPP", "yes")])
+
+
+def test_delete_profile_everything_correct(mock_environment, monkeypatch, tmp_path, username, password, decision):
+    users_file = mock_environment
+    saving_data_to_file(users_file, tmp_path)
+    user_file = tmp_path / f"{username}.json"
+    user_data = {"username": username, "password": password, "file": user_file}
+    inputs = [password, decision, decision]
+    monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
+    # _ = delete_profile(user_data)
+    assert_profiles_deleting(user_data, user_file, users_file)
+
+
+@pytest.mark.parametrize("username, password1, password2, decision", [
+    ("jacek", "321", "123", "yes"),
+    ("leon4jds", "Fsckj123lv", "F@BafvLOP", "yes"),
+    ("ann531", "vader123", "hobbit123", "yes"),
+    ("johnus941", "njzpjnDGK", "arZWksPP", "yes")])
+
+
+def test_delete_profile_wrong_password(mock_environment, monkeypatch, tmp_path, username, password1, password2, decision):
+    users_file = mock_environment
+    saving_data_to_file(users_file, tmp_path)
+    user_file = tmp_path / f"{username}.json"
+    user_data = {"username": username, "password": password2, "file": user_file}
+    inputs = [password1, password2, decision, decision]
+    monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
+    # _ = delete_profile(user_data)
+    assert_profiles_deleting(user_data, user_file, users_file)
