@@ -173,7 +173,7 @@ def test_delete_profile_everything_correct(mock_environment, monkeypatch, tmp_pa
     user_data = {"username": username, "password": password, "file": user_file}
     inputs = [password, decision, decision]
     monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
-    # _ = delete_profile(user_data)
+    # _, _ = delete_profile(user_data, users_file)
     assert_profiles_deleting(user_data, user_file, users_file)
 
 
@@ -191,5 +191,46 @@ def test_delete_profile_wrong_password(mock_environment, monkeypatch, tmp_path, 
     user_data = {"username": username, "password": password2, "file": user_file}
     inputs = [password1, password2, decision, decision]
     monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
-    # _ = delete_profile(user_data)
+    # _, _ = delete_profile(user_data, users_file)
     assert_profiles_deleting(user_data, user_file, users_file)
+
+
+def assert_profiles_deleting_cancel(user_data, user_file, users_file):
+    assert user_data in users_file
+    assert user_file.exists()
+
+
+@pytest.mark.parametrize("username, password, decision", [
+    ("jacek", "123", "return"),
+    ("leon4jds", "F@BafvLOP", "return"),
+    ("ann531", "hobbit123", "return"),
+    ("johnus941", "arZWksPP", "return")])
+
+
+def test_delete_profile_cancel1(mock_environment, monkeypatch, tmp_path, username, password, decision):
+    users_file = mock_environment
+    saving_data_to_file(users_file, tmp_path)
+    user_file = tmp_path / f"{username}.json"
+    user_data = {"username": username, "password": password, "file": user_file}
+    inputs = [decision]
+    monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
+    # _, _ = delete_profile(user_data, users_file)
+    assert_profiles_deleting_cancel(user_data, user_file, users_file)
+
+
+@pytest.mark.parametrize("username, password, decision", [
+    ("jacek", "123", "no"),
+    ("leon4jds", "F@BafvLOP", "no"),
+    ("ann531", "hobbit123", "no"),
+    ("johnus941", "arZWksPP", "no")])
+
+
+def test_delete_profile_cancel2(mock_environment, monkeypatch, tmp_path, username, password, decision):
+    users_file = mock_environment
+    saving_data_to_file(users_file, tmp_path)
+    user_file = tmp_path / f"{username}.json"
+    user_data = {"username": username, "password": password, "file": user_file}
+    inputs = [password, decision]
+    monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
+    # _, _ = delete_profile(user_data, users_file)
+    assert_profiles_deleting_cancel(user_data, user_file, users_file)
