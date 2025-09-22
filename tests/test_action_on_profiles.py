@@ -176,7 +176,7 @@ def test_delete_profile_everything_correct(mock_environment, monkeypatch, tmp_pa
     user_data = {"username": username, "password": password, "file": str(user_file)}
     inputs = [password, decision, decision]
     monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
-    _, _ = delete_profile(user_data, users_file)
+    delete_profile(user_data, users_file)
     assert_profiles_deleting(user_data, user_file, users_file)
 
 
@@ -194,7 +194,7 @@ def test_delete_profile_wrong_password(mock_environment, monkeypatch, tmp_path, 
     user_data = {"username": username, "password": password2, "file": str(user_file)}
     inputs = [password1, password2, decision, decision]
     monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
-    _, _ = delete_profile(user_data, users_file)
+    delete_profile(user_data, users_file)
     assert_profiles_deleting(user_data, user_file, users_file)
 
 
@@ -220,7 +220,7 @@ def test_delete_profile_cancel1(mock_environment, monkeypatch, tmp_path, usernam
     user_data = {"username": username, "password": password, "file": str(user_file)}
     inputs = [decision]
     monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
-    _, _ = delete_profile(user_data, users_file)
+    delete_profile(user_data, users_file)
     assert_profiles_deleting_cancel(user_data, user_file, users_file)
 
 
@@ -238,7 +238,7 @@ def test_delete_profile_cancel2(mock_environment, monkeypatch, tmp_path, usernam
     user_data = {"username": username, "password": password, "file": str(user_file)}
     inputs = [password, decision]
     monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
-    _, _ = delete_profile(user_data, users_file)
+    delete_profile(user_data, users_file)
     assert_profiles_deleting_cancel(user_data, user_file, users_file)
 
 
