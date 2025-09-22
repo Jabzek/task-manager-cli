@@ -240,3 +240,80 @@ def test_delete_profile_cancel2(mock_environment, monkeypatch, tmp_path, usernam
     monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
     _, _ = delete_profile(user_data, users_file)
     assert_profiles_deleting_cancel(user_data, user_file, users_file)
+
+
+def assert_change_password(users_file, username, old_password, new_password, cancel):
+    with open(users_file, "r") as f:
+        users_data = json.load(f)
+    
+    for user in users_data:
+        if user["username"] == username:
+            if not cancel:
+                assert user["password"] == new_password
+            else:
+                assert user["password"] == old_password
+
+
+@pytest.mark.parametrize("username, password1, password2", [
+    ("jacek", "123", "321"),
+    ("leon4jds", "F@BafvLOP", "SBakkds"),
+    ("ann531", "hobbit123", "vader123"),
+    ("johnus941", "arZWksPP", "Blaju3")])
+
+
+def test_change_password_everything_correct(mock_environment, monkeypatch, tmp_path, username, password1, password2):
+    users_file = mock_environment
+    saving_data_to_file(users_file, tmp_path)
+    inputs = [password1, password2, password2]
+    monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
+    # password_change(users_file, password1)
+    assert_change_password(users_file, username, password1, password2, cancel=False)
+
+
+@pytest.mark.parametrize("username, wrong_password, password1, password2", [
+    ("jacek", "fnjs", "123", "321"),
+    ("leon4jds", "SJFj13gd", "F@BafvLOP", "SBakkds"),
+    ("ann531", "GDjahhpi32", "hobbit123", "vader123"),
+    ("johnus941", "mkmsafk@#%$", "arZWksPP", "Blaju3")])
+
+
+def test_change_password_wrong_password(mock_environment, monkeypatch, tmp_path, username, wrong_password, password1, password2):
+    users_file = mock_environment
+    saving_data_to_file(users_file, tmp_path)
+    inputs = [wrong_password, password1, password2, password2]
+    monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
+    # password_change(users_file, password1)
+    assert_change_password(users_file, username, password1, password2, cancel=False)
+
+
+@pytest.mark.parametrize("username, password1, password2", [
+    ("jacek", "123", "321"),
+    ("leon4jds", "F@BafvLOP", "SBakkds"),
+    ("ann531", "hobbit123", "vader123"),
+    ("johnus941", "arZWksPP", "Blaju3")])
+
+
+def test_change_password_same_password(mock_environment, monkeypatch, tmp_path, username, password1, password2):
+    users_file = mock_environment
+    saving_data_to_file(users_file, tmp_path)
+    inputs = [password1, password1, password2, password2]
+    monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
+    # password_change(users_file, username, password1)
+    assert_change_password(users_file, username, password1, password2, cancel=False)
+
+
+@pytest.mark.parametrize("username, password, decision", [
+    ("jacek", "123", "return"),
+    ("leon4jds", "F@BafvLOP", "return"),
+    ("ann531", "hobbit123", "return"),
+    ("johnus941", "arZWksPP", "return")])
+
+
+def test_change_password_cancel(mock_environment, monkeypatch, tmp_path, username, password, decision):
+    users_file = mock_environment
+    saving_data_to_file(users_file, tmp_path)
+    inputs = [decision]
+    monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
+    # password_change(users_file, username, password)
+    assert_change_password(users_file, username, password, None, cancel=True)
+
