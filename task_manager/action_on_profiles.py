@@ -125,3 +125,7 @@ def delete_profile(user_data, users_file):
             return True, True
         else:
             print("Try again.")
+
+
+def change_password():
+    pass

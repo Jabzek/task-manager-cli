@@ -1,13 +1,15 @@
 from time import sleep
-from action_on_profiles import create_profile, get_file, log_into_profile, delete_profile
+from action_on_profiles import create_profile, get_file, log_into_profile, delete_profile, change_password
 
-# To do: Remove account, add task, remove task, show tasks (with filtres), password change, 
+# To do: add task, remove task, show tasks (with filtres), password change, 
 # task status change, task edit, task history, 
 
 
 def managing_account(user_data, users_file):
     username = user_data["username"]
+    password = user_data["password"]
     print(f"Welcome {username}!!!")
+    
     while True: 
         user_action = input("What do you want to do: ").strip()
         match user_action:
@@ -24,6 +26,8 @@ def managing_account(user_data, users_file):
                 if not delete:
                     continue
                 break   
+            case "password":
+                change_password()
     return exit
 
 
