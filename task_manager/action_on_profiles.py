@@ -71,6 +71,7 @@ def log_into_profile(users_file):
             for user in profile_list:
                 if user["username"] == username:
                     user_data = user
+                    break
             
             password = input("Password: ").strip()
             if password != user_data["password"]:
@@ -109,6 +110,7 @@ def delete_profile(user_data, users_file):
                 if user_data["username"] == user["username"]:
                     idx = users_data.index(user)
                     users_data.pop(idx)
+                    break
             
             with open(users_file, "w") as f:
                 json.dump(users_data, f, indent=2)
@@ -127,5 +129,42 @@ def delete_profile(user_data, users_file):
             print("Try again.")
 
 
-def change_password():
-    pass
+def change_password(users_file, username, password):
+    print("Enter your password to change for a new one. If you enter \"return\" you will cancel your decision.")
+    while True:
+        old_password = input("Password: ").strip()
+        if old_password == password:
+            break
+        elif old_password == "return":
+            return
+        else:
+            print("Try again.")
+    
+    print("Enter a new password.")
+    while True:
+        new_password = input("New password: ").strip()
+        if new_password == old_password:
+            print("You have entered your old password. Try again.")
+            continue
+        
+        print("Repeat your new password.")
+        repeat_password = input("New password: ").strip()
+        if new_password != repeat_password:
+            print("Passwords are not the same. Try again.")
+            continue
+        
+        print("Password has been changed.")
+        break
+    
+    with open(users_file, "r") as f:
+        users_data = json.load(f)
+
+    for user in users_data:
+        if user["username"] == username:
+            user["password"] = new_password
+            break
+
+    with open(users_file, "w") as f:
+        json.dump(users_data, f, indent=2)
+
+    return user, new_password 

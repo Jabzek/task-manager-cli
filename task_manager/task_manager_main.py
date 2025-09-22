@@ -27,7 +27,7 @@ def managing_account(user_data, users_file):
                     continue
                 break   
             case "password":
-                change_password()
+                user_data, password = change_password(users_file, username, password)
     return exit
 
 
