@@ -79,9 +79,49 @@ def log_into_profile(users_file):
         except NameError:
             print("User does not exist. Try again.")
         except PermissionError:
-            print("Wrong password. Try again")
+            print("Wrong password. Try again.")
     return user_data
 
 
-def delete_profile():
-    pass
+def delete_profile(user_data, users_file):
+    print("Enter password to delete the account. If you enter \"return\" you will cancel your decision")
+    while True:
+        password = input("Password: ").strip()
+        if password == user_data["password"]:
+            break
+        elif password == "return":
+            return False, None 
+        print("Try again.")
+    
+    print("Are you sure to delete your profile?")
+    while True:
+        decision = input("Decision: ")
+        if decision == "no":
+            return False, None
+        elif decision == "yes":
+            file = user_data["file"]
+            Path(file).unlink()
+            
+            with open(users_file, "r") as f:
+                users_data = json.load(f)
+            
+            for user in users_data:
+                if user_data["username"] == user["username"]:
+                    idx = users_data.index(user)
+                    users_data.pop(idx)
+            
+            with open(users_file, "w") as f:
+                json.dump(users_data, f, indent=2)
+            break
+        else:
+            print("Try again.")
+    
+    print("Do you want close Task Manager?")
+    while True:
+        exit_decision = input("Decision: ").strip()
+        if exit_decision == "no":
+            return True, False
+        elif exit_decision == "yes":
+            return True, True
+        else:
+            print("Try again.")
