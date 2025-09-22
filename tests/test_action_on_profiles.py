@@ -252,6 +252,7 @@ def assert_change_password(users_file, username, old_password, new_password, can
                 assert user["password"] == new_password
             else:
                 assert user["password"] == old_password
+            break
 
 
 @pytest.mark.parametrize("username, password1, password2", [
@@ -266,7 +267,7 @@ def test_change_password_everything_correct(mock_environment, monkeypatch, tmp_p
     saving_data_to_file(users_file, tmp_path)
     inputs = [password1, password2, password2]
     monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
-    change_password(users_file, password1)
+    change_password(users_file, username, password1)
     assert_change_password(users_file, username, password1, password2, cancel=False)
 
 
@@ -282,7 +283,7 @@ def test_change_password_wrong_old_password(mock_environment, monkeypatch, tmp_p
     saving_data_to_file(users_file, tmp_path)
     inputs = [wrong_password, password1, password2, password2]
     monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
-    change_password(users_file, password1)
+    change_password(users_file, username, password1)
     assert_change_password(users_file, username, password1, password2, cancel=False)
 
 
