@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from task_manager import action_on_profiles
-from task_manager.action_on_profiles import create_profile, log_into_profile, delete_profile
+from task_manager.action_on_profiles import create_profile, log_into_profile, delete_profile, change_password
 
 @pytest.fixture
 def mock_environment(monkeypatch, tmp_path):
@@ -266,7 +266,7 @@ def test_change_password_everything_correct(mock_environment, monkeypatch, tmp_p
     saving_data_to_file(users_file, tmp_path)
     inputs = [password1, password2, password2]
     monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
-    # password_change(users_file, password1)
+    change_password(users_file, password1)
     assert_change_password(users_file, username, password1, password2, cancel=False)
 
 
@@ -277,12 +277,12 @@ def test_change_password_everything_correct(mock_environment, monkeypatch, tmp_p
     ("johnus941", "mkmsafk@#%$", "arZWksPP", "Blaju3")])
 
 
-def test_change_password_wrong_password(mock_environment, monkeypatch, tmp_path, username, wrong_password, password1, password2):
+def test_change_password_wrong_old_password(mock_environment, monkeypatch, tmp_path, username, wrong_password, password1, password2):
     users_file = mock_environment
     saving_data_to_file(users_file, tmp_path)
     inputs = [wrong_password, password1, password2, password2]
     monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
-    # password_change(users_file, password1)
+    change_password(users_file, password1)
     assert_change_password(users_file, username, password1, password2, cancel=False)
 
 
@@ -298,7 +298,23 @@ def test_change_password_same_password(mock_environment, monkeypatch, tmp_path, 
     saving_data_to_file(users_file, tmp_path)
     inputs = [password1, password1, password2, password2]
     monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
-    # password_change(users_file, username, password1)
+    change_password(users_file, username, password1)
+    assert_change_password(users_file, username, password1, password2, cancel=False)
+
+
+@pytest.mark.parametrize("username, wrong_password, password1, password2", [
+    ("jacek", "fnjs", "123", "321"),
+    ("leon4jds", "SJFj13gd", "F@BafvLOP", "SBakkds"),
+    ("ann531", "GDjahhpi32", "hobbit123", "vader123"),
+    ("johnus941", "mkmsafk@#%$", "arZWksPP", "Blaju3")])
+
+
+def test_change_password_bad_repetition(mock_environment, monkeypatch, tmp_path, username, wrong_password, password1, password2):
+    users_file = mock_environment
+    saving_data_to_file(users_file, tmp_path)
+    inputs = [password1, password2, wrong_password, password2, password2]
+    monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
+    change_password(users_file, username, password1)
     assert_change_password(users_file, username, password1, password2, cancel=False)
 
 
@@ -314,6 +330,6 @@ def test_change_password_cancel(mock_environment, monkeypatch, tmp_path, usernam
     saving_data_to_file(users_file, tmp_path)
     inputs = [decision]
     monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
-    # password_change(users_file, username, password)
+    change_password(users_file, username, password)
     assert_change_password(users_file, username, password, None, cancel=True)
 
