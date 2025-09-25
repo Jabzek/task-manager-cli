@@ -5,6 +5,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from task_manager.action_on_tasks import get_date 
 
+@pytest.fixture
+def get_date_fixture(monkeypatch):
+    monkeypatch.setattr("builtins.print", lambda *a, **kw: None)
+    fake_now = datetime(2025, 5, 14, 12, 30)
+    return fake_now
+
 
 def assert_get_date(final_date, fake_now, shifted_time):
     final_test_date = datetime(shifted_time[0], shifted_time[1], shifted_time[2], 
@@ -20,9 +26,8 @@ def assert_get_date(final_date, fake_now, shifted_time):
     [2025, 5, 15, 10, 0]))
 
 
-def test_get_date_everything_correct(monkeypatch, shifted_time):
-    monkeypatch.setattr("builtins.print", lambda *a, **kw: None)
-    fake_now = datetime(2025, 5, 14, 12, 30)
+def test_get_date_everything_correct(get_date_fixture, monkeypatch, shifted_time):
+    fake_now = get_date_fixture
     shifted_time_copy = shifted_time.copy()
     monkeypatch.setattr("builtins.input", lambda _: shifted_time_copy.pop(0))
     final_date = get_date(fake_now)
@@ -35,9 +40,8 @@ def test_get_date_everything_correct(monkeypatch, shifted_time):
     ([2025, 5, 18, 12, 30], 2, 13)))
 
 
-def test_get_date_past_date(monkeypatch, shifted_time, index, value):
-    monkeypatch.setattr("builtins.print", lambda *a, **kw: None)
-    fake_now = datetime(2025, 5, 14, 12, 30)
+def test_get_date_past_date(get_date_fixture, monkeypatch, shifted_time, index, value):
+    fake_now = get_date_fixture
     shifted_time_copy = shifted_time.copy()
     shifted_time_copy.insert(index, value)
     monkeypatch.setattr("builtins.input", lambda _: shifted_time_copy.pop(0))
@@ -52,9 +56,8 @@ def test_get_date_past_date(monkeypatch, shifted_time, index, value):
     ([2028, 7, 1, 13, 30], 4, 86)))
 
 
-def test_get_date_wrong_date(monkeypatch, shifted_time, index, value):
-    monkeypatch.setattr("builtins.print", lambda *a, **kw: None)
-    fake_now = datetime(2025, 5, 14, 12, 30)
+def test_get_date_wrong_date(get_date_fixture, monkeypatch, shifted_time, index, value):
+    fake_now = get_date_fixture
     shifted_time_copy = shifted_time.copy()
     shifted_time_copy.insert(index, value)
     monkeypatch.setattr("builtins.input", lambda _: shifted_time_copy.pop(0))
