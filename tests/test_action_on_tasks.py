@@ -7,22 +7,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from task_manager.action_on_tasks import get_date 
 
 
-@pytest.fixture
-def mock_environment_get_date(monkeypatch):
-    monkeypatch.setattr("builtins.print", lambda *a, **kw: None)
-    fake_now = datetime.now()
-    monkeypatch.setattr(datetime, "now", lambda: fake_now)
-    return fake_now
-
-
-def time_shift(shifts, fake_now):
-    shifted_date = fake_now + relativedelta(years=shifts[0], months=shifts[1], days=shifts[2],
-                                            hours=shifts[3], minutes=shifts[4])
-    shifted_time = [shifted_date.year, shifted_date.month, shifted_date.day, shifted_date.hour,
-                    shifted_date.minute]
-    return shifted_time
-
-
 def assert_get_date(final_date, fake_now, shifted_time):
     final_test_date = datetime(shifted_time[0], shifted_time[1], shifted_time[2], 
                                shifted_time[3], shifted_time[4])    
@@ -31,55 +15,49 @@ def assert_get_date(final_date, fake_now, shifted_time):
     assert final_date > fake_now
 
 
-@pytest.mark.parametrize("shifts", ( 
-    [1, 2, 12, 3, 5],
-    [12, 5, 10, 11, 3],
-    [35, 0, 0, 12, 0]))
+@pytest.mark.parametrize("shifted_time", (
+    [2026, 4, 13, 7, 20],
+    [2025, 12, 1, 1, 0],
+    [2025, 5, 15, 10, 0]))
 
 
-def test_get_date_everything_correct(mock_environment_get_date, monkeypatch, shifts):
-    fake_now = mock_environment_get_date
-    shifted_time = time_shift(shifts, fake_now)
-    monkeypatch.setattr("builtins.input", lambda _: shifted_time.pop(0))
-    final_date = get_date()
+def test_get_date_everything_correct(monkeypatch, shifted_time):
+    monkeypatch.setattr("builtins.print", lambda *a, **kw: None)
+    fake_now = datetime(2025, 5, 14, 12, 30)
+    shifted_time_copy = shifted_time.copy()
+    monkeypatch.setattr("builtins.input", lambda _: shifted_time_copy.pop(0))
+    final_date = get_date(fake_now)
     assert_get_date(final_date, fake_now, shifted_time)
 
 
-@pytest.mark.parametrize("shifts", (
-    [-1, 2, 12, 3, 5, 1, 2, 12, 3, 5],
-    [0, -1, 0, 12, 0, 0, 1, 0, 12, 0],
-    [0, 0, -5, 23, 24, 0, 0, 5, 23, 24]))
+@pytest.mark.parametrize("shifted_time, index, value", (
+    ([2025, 12, 1, 12, 20], 0, 2024),
+    ([2025, 6, 14, 12, 39], 1, 4),
+    ([2025, 5, 18, 12, 30], 2, 13)))
 
 
-def test_get_date_past_date(mock_environment_get_date, monkeypatch, shifts):
-    fake_now = mock_environment_get_date
-    shifted_time_wrong = time_shift(shifts[:5], fake_now)
-    shifted_time_correct = time_shift(shifts[5:], fake_now)
-    shifted_time = []
-
-    for idx in range(5):
-        if shifted_time_wrong[idx] == shifted_time_correct[idx]:
-            shifted_time.append(shifted_time_correct[idx])
-        else:
-            shifted_time.append(shifted_time_wrong[idx])
-            shifted_time.append(shifted_time_correct[idx])
-
-    monkeypatch.setattr("builtins.input", lambda _: shifted_time.pop(0))
-    final_date = get_date()
-    assert_get_date(final_date, fake_now, shifted_time_correct)
+def test_get_date_past_date(monkeypatch, shifted_time, index, value):
+    monkeypatch.setattr("builtins.print", lambda *a, **kw: None)
+    fake_now = datetime(2025, 5, 14, 12, 30)
+    shifted_time_copy = shifted_time.copy()
+    shifted_time_copy.insert(index, value)
+    monkeypatch.setattr("builtins.input", lambda _: shifted_time_copy.pop(0))
+    final_date = get_date(fake_now)
+    assert_get_date(final_date, fake_now, shifted_time)
 
 
-@pytest.mark.parametrize("shifts, index, error_number", ( 
-    ([1, 2, 12, 3, 5], 1, 13),
-    ([12, 5, 10, 11, 3], 2, 32),
-    ([35, 0, 0, 12, 0], 3, 26),
-    ([6, 7, 1, 1, 2], 4, 65)))
+@pytest.mark.parametrize("shifted_time, index, value", ( 
+    ([2025, 12, 12, 0, 5], 1, 13),
+    ([2030, 4, 30, 1, 35], 2, 31),
+    ([2027, 3, 15, 12, 0], 3, 25),
+    ([2028, 7, 1, 13, 30], 4, 86)))
 
 
-def test_get_date_wrong_date(mock_environment_get_date, monkeypatch, shifts, idx, error_number):
-    fake_now = mock_environment_get_date
-    shifted_time = time_shift(shifts, fake_now)
-    shifted_time.insert(idx, error_number)
-    monkeypatch.setattr("builtins.input", lambda _: shifted_time.pop(0))
-    final_date = get_date()
+def test_get_date_wrong_date(monkeypatch, shifted_time, index, value):
+    monkeypatch.setattr("builtins.print", lambda *a, **kw: None)
+    fake_now = datetime(2025, 5, 14, 12, 30)
+    shifted_time_copy = shifted_time.copy()
+    shifted_time_copy.insert(index, value)
+    monkeypatch.setattr("builtins.input", lambda _: shifted_time_copy.pop(0))
+    final_date = get_date(fake_now)
     assert_get_date(final_date, fake_now, shifted_time)
