@@ -16,11 +16,10 @@ def mock_environment_get_date(monkeypatch):
 
 
 def time_shift(shifts, fake_now):
-    shifted_time = [fake_now.year + relativedelta(years=shifts[0]),
-                    fake_now.month + relativedelta(months=shifts[1]),
-                    fake_now.day + relativedelta(days=shifts[2]),
-                    fake_now.hour + relativedelta(hours=shifts[3]),
-                    fake_now.minute + relativedelta(minutes=shifts[4])]
+    shifted_date = fake_now + relativedelta(years=shifts[0], months=shifts[1], days=shifts[2],
+                                            hours=shifts[3], minutes=shifts[4])
+    shifted_time = [shifted_date.year, shifted_date.month, shifted_date.day, shifted_date.hour,
+                    shifted_date.minute]
     return shifted_time
 
 
