@@ -2,16 +2,14 @@ from dataclasses import dataclass, asdict
 from datetime import datetime
 
 
-
 @dataclass
 class Task:
     name: str
     description: str
     priority: str    #urgent, important, not important
-    date_of_creation: str
-    deadline: str
-    status: str     #active, pending 
-    date_of_start: str
+    date_of_creation: datetime
+    deadline: datetime
+    status: str     #active, pending, finished 
 
 
 def get_date(current_time):
@@ -71,3 +69,7 @@ def get_date(current_time):
             print("Provide correct minute. Try again.")
 
     return temp_date
+
+
+def create_task(creation_date, userfile):
+    pass
