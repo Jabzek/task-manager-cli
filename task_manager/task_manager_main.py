@@ -1,4 +1,5 @@
 from time import sleep
+from datetime import datetime
 from action_on_profiles import create_profile, get_file, log_into_profile, delete_profile, change_password
 from action_on_tasks import create_task
 # To do: add task, remove task, show tasks (with filtres), task status change, task edit, task history, 
@@ -21,13 +22,16 @@ def managing_account(user_data, users_file):
                 print("Logging out of your profile.")
                 exit = False
                 break
-            case "delete":
+            case "delete account":
                 delete, exit = delete_profile(user_data, users_file)
                 if not delete:
                     continue
                 break   
             case "password":
                 user_data, password = change_password(users_file, username, password)
+            case "create":
+                creation_date = datetime.now()
+                create_task(creation_date, file)
     return exit
 
 

@@ -1,6 +1,7 @@
+import json
 from dataclasses import dataclass, asdict
 from datetime import datetime
-
+from pathlib import Path
 
 @dataclass
 class Task:
@@ -71,5 +72,47 @@ def get_date(current_time):
     return temp_date
 
 
+def get_task_name(tasks_name):
+    while True:
+        try:
+            name = input("Provide task name: ").strip()
+            if not 1 <= len(name) <= 25: 
+                raise ValueError
+            if name in tasks_name:
+                raise NameError
+            break
+        except ValueError:
+            print("The maximum length of a task name is 25.")
+        except NameError:
+            print("Task name already exists.")
+    return name
+
+
+def get_task_priority():
+    while True:
+        try:
+            priority = input("Provide task priority (urgent, important, not important): ").strip()
+            if priority != "urgent" or priority != "important" or priority != "not important":
+                raise ValueError
+            break
+        except ValueError:
+            print("Choose urgent, important or not important priority.")
+    return priority
+
+
 def create_task(creation_date, userfile):
-    pass
+    tasks_name = []
+    if Path(userfile).stat().st_size == 0:
+        tasks = []
+    else:
+        with open(userfile, "r") as f:
+            tasks = json.load(f)
+        for el in tasks:
+            tasks_name.append(el["name"])
+
+    name = get_task_name(tasks_name)
+    descripiton = input("Provide description of the task: ")
+    priority = get_task_priority()
+    deadline = get_date(creation_date)
+
+    task = Task(name, descripiton, priority, creation_date, deadline, status="pending")
