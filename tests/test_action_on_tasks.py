@@ -113,7 +113,7 @@ def test_create_task_adding_first_task(monkeypatch, create_task_fixture, name, d
 
 
 @pytest.mark.parametrize("wrong_name, name, description, wrong_priority, priority, deadline", (
-    ("a" * 40, "task1", "description1", "good", "urgent", "2025-6-10-18-00"),
+    ("a" * 30, "task1", "description1", "good", "urgent", "2025-6-10-18-00"),
     ("", "1", "descripiton2", "bad", "important", "2025-9-11-15-00"),
     ("name_taken", "1", "descripiton3", "insteresting", "important", "2025-9-11-15-00")))
 
