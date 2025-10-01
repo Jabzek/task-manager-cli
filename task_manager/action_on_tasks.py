@@ -100,6 +100,21 @@ def get_task_priority():
     return priority
 
 
+def get_status():
+    print("Do you want to set the task status to active?")
+    while True:
+        try:
+            active_status = input("Decision: ").strip()
+            if active_status == "yes":
+                return "active"
+            elif active_status == "no":
+                return "pending"
+            else:
+                raise ValueError
+        except:
+            print("Try again.")
+
+
 def create_task(creation_date, userfile):
     tasks_name = []
     if Path(userfile).stat().st_size == 0:
@@ -107,12 +122,13 @@ def create_task(creation_date, userfile):
     else:
         with open(userfile, "r") as f:
             tasks = json.load(f)
-        for el in tasks:
-            tasks_name.append(el["name"])
+    for el in tasks:
+        tasks_name.append(el["name"])
 
     name = get_task_name(tasks_name)
     descripiton = input("Provide description of the task: ")
     priority = get_task_priority()
     deadline = get_date(creation_date)
+    status = get_status()
 
-    task = Task(name, descripiton, priority, creation_date, deadline, status="pending")
+    task = Task(name, descripiton, priority, creation_date, deadline, status)
