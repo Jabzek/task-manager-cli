@@ -83,7 +83,7 @@ def saving_date(user_file, task_date_creation):
             "status": "pending"},
             {"name": "task2", "description": "description3", "priority": "urgent",
             "date_of_creation": task_date_creation, "not important": datetime(2026, 2, 1, 15, 0),
-            "status": "pending"}]
+            "status": "active"}]
     with open(user_file, "w") as f:
         json.dump(data, f, indent=2)
 
@@ -94,57 +94,57 @@ def assert_task_create(user_file, task):
     assert task in tasks
 
 
-@pytest.mark.parametrize("name, description, priority, deadline", (
-    ("task1", "description1", "urgent", "2025-6-10-18-00"),
-    ("task2", "descripiton2", "important", "2025-9-11-15-00"),
-    ("task3", "", "not important", "2026-3-17-19-00")))
+@pytest.mark.parametrize("name, description, priority, deadline, active_status", (
+    ("task1", "description1", "urgent", "2025-6-10-18-00", "no"),
+    ("task2", "descripiton2", "important", "2025-9-11-15-00", "yes"),
+    ("task3", "", "not important", "2026-3-17-19-00", "no")))
 
 
-def test_create_task_adding_first_task(monkeypatch, create_task_fixture, name, description, priority, deadline):
+def test_create_task_adding_first_task(monkeypatch, create_task_fixture, name, description, priority, deadline, active_status):
     task_date_creation, user_file = create_task_fixture
     deadline = datetime.strptime(deadline, "%Y-%m-%d-%H-%M")
-    inputs = [name, description, priority, deadline]
+    inputs = [name, description, priority, deadline, active_status]
     monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
     task = {"name": name, "description": description, "priority": priority,
             "date_of_creation": task_date_creation, "deadline": deadline,
-            "status": "pending"}
+            "status": active_status}
     create_task(task_date_creation, user_file)
     assert_task_create(user_file, task)
 
 
-@pytest.mark.parametrize("wrong_name, name, description, wrong_priority, priority, deadline", (
-    ("a" * 30, "task1", "description1", "good", "urgent", "2025-6-10-18-00"),
-    ("", "1", "descripiton2", "bad", "important", "2025-9-11-15-00"),
-    ("name_taken", "1", "descripiton3", "insteresting", "important", "2025-9-11-15-00")))
+@pytest.mark.parametrize("wrong_name, name, description, wrong_priority, priority, deadline, wrong_status, active_status", (
+    ("a" * 30, "task1", "description1", "good", "urgent", "2025-6-10-18-00", "status", "no"),
+    ("", "1", "descripiton2", "bad", "important", "2025-9-11-15-00", "jafdsnfj", "no"),
+    ("name_taken", "1", "descripiton3", "insteresting", "important", "2025-9-11-15-00", "active", "yes")))
 
 
-def test_create_task_wrong_name_and_priority(monkeypatch, create_task_fixture, wrong_name, name, description, wrong_priority, priority, deadline):
+def test_create_task_wrong_data(monkeypatch, create_task_fixture, wrong_name, name, description, wrong_priority, priority, deadline, wrong_status, active_status):
     task_date_creation, user_file = create_task_fixture
     deadline = datetime.strptime(deadline, "%Y-%m-%d-%H-%M")
-    inputs = [wrong_name, name, description, wrong_priority, priority, deadline]
+    inputs = [wrong_name, name, description, wrong_priority, priority, deadline, wrong_status, active_status]
     monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
     task = {"name": name, "description": description, "priority": priority,
             "date_of_creation": task_date_creation, "deadline": deadline,
-            "status": "pending"}
+            "status": active_status}
     saving_date(user_file, task_date_creation)
     create_task(task_date_creation, user_file)
     assert_task_create(user_file, task)
 
 
-@pytest.mark.parametrize("name, description, priority, deadline", (
-    ("task4", "description1", "urgent", "2025-5-20-18-00"),
-    ("task5", "descripiton2", "important", "2025-9-11-15-00"),
-    ("task6", "", "not important", "2026-3-17-19-00")))
+@pytest.mark.parametrize("name, description, priority, deadline, active_status", (
+    ("task4", "description1", "urgent", "2025-5-20-18-00", "yes"),
+    ("task5", "descripiton2", "important", "2025-9-11-15-00", "no"),
+    ("task6", "", "not important", "2026-3-17-19-00", "no")))
 
 
-def test_create_task_adding_another_task(monkeypatch, create_task_fixture, name, description, priority, deadline):
+def test_create_task_adding_another_task(monkeypatch, create_task_fixture, name, description, priority, deadline, active_status):
     task_date_creation, user_file = create_task_fixture
     deadline = datetime.strptime(deadline, "%Y-%m-%d-%H-%M")
-    inputs = [name, description, priority, deadline]
+    inputs = [name, description, priority, deadline, active_status]
     monkeypatch.setattr("builtins.input", lambda _: inputs.pop(0))
     task = {"name": name, "description": description, "priority": priority,
             "date_of_creation": task_date_creation, "deadline": deadline,
-            "status": "pending"}
+            "status": active_status}
     saving_date(user_file, task_date_creation)
     create_task(task_date_creation, user_file)
     assert_task_create(user_file, task)
