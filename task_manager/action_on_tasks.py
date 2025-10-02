@@ -7,10 +7,12 @@ from pathlib import Path
 class Task:
     name: str
     description: str
-    priority: str    #urgent, important, not important
-    date_of_creation: datetime
-    deadline: datetime
-    status: str     #active, pending, finished 
+    priority: str
+    date_of_creation: str
+    deadline: str
+
+    def to_dict(self):
+        return asdict(self)
 
 
 def get_date(current_time):
@@ -68,8 +70,8 @@ def get_date(current_time):
             break
         except ValueError:
             print("Provide correct minute. Try again.")
-
-    return temp_date
+    str_date = temp_date.strftime("%Y-%m-%d %H:%M")
+    return str_date
 
 
 def get_task_name(tasks_name):
@@ -92,7 +94,7 @@ def get_task_priority():
     while True:
         try:
             priority = input("Provide task priority (urgent, important, not important): ").strip()
-            if priority != "urgent" or priority != "important" or priority != "not important":
+            if priority not in ("urgent", "important", "not important"):
                 raise ValueError
             break
         except ValueError:
@@ -117,18 +119,33 @@ def get_status():
 
 def create_task(creation_date, userfile):
     tasks_name = []
+    creation_date_str = creation_date.strftime("%Y-%m-%d %H:%M")
+    
     if Path(userfile).stat().st_size == 0:
-        tasks = []
+        tasks = {"pending": [],
+                 "active": [], 
+                 "finished": []}
     else:
         with open(userfile, "r") as f:
             tasks = json.load(f)
-    for el in tasks:
-        tasks_name.append(el["name"])
+    
+    for category in ("pending", "active"):
+        for task in tasks[category]:
+            tasks_name.append(task["name"])
 
     name = get_task_name(tasks_name)
     descripiton = input("Provide description of the task: ")
     priority = get_task_priority()
+    print("Now enter deadline of the task")
     deadline = get_date(creation_date)
     status = get_status()
+    task = Task(name, descripiton, priority, creation_date_str, deadline)
+    task_dict = task.to_dict()
 
-    task = Task(name, descripiton, priority, creation_date, deadline, status)
+    if status == "pending":
+        tasks["pending"].append(task_dict)
+    else:
+        tasks["active"].append(task_dict)
+
+    with open(userfile, "w") as f:
+        json.dump(tasks, f, indent=2)
