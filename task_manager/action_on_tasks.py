@@ -8,6 +8,7 @@ class Task:
     name: str
     description: str
     priority: str
+    status: str
     date_of_creation: str
     deadline: str
 
@@ -117,6 +118,16 @@ def get_status():
             print("Try again.")
 
 
+def create_task_input(tasks_name, creation_date):
+    name = get_task_name(tasks_name)
+    descripiton = input("Provide description of the task: ")
+    priority = get_task_priority()
+    print("Now enter deadline of the task")
+    deadline = get_date(creation_date)
+    status = get_status()
+    return name, descripiton, priority, deadline, status
+
+
 def create_task(creation_date, userfile):
     tasks_name = []
     creation_date_str = creation_date.strftime("%Y-%m-%d %H:%M")
@@ -132,14 +143,9 @@ def create_task(creation_date, userfile):
     for category in ("pending", "active"):
         for task in tasks[category]:
             tasks_name.append(task["name"])
-
-    name = get_task_name(tasks_name)
-    descripiton = input("Provide description of the task: ")
-    priority = get_task_priority()
-    print("Now enter deadline of the task")
-    deadline = get_date(creation_date)
-    status = get_status()
-    task = Task(name, descripiton, priority, creation_date_str, deadline)
+        
+    name, description, priority, deadline, status = create_task_input(tasks_name, creation_date)       
+    task = Task(name, description, priority, status, creation_date_str, deadline)
     task_dict = task.to_dict()
 
     if status == "pending":

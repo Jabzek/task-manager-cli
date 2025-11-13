@@ -7,7 +7,6 @@ from action_on_tasks import create_task
 
 def managing_account(user_data, users_file):
     username = user_data["username"]
-    password = user_data["password"]
     file = user_data["file"]
     print(f"Welcome {username}!!!")
     
@@ -28,7 +27,7 @@ def managing_account(user_data, users_file):
                     continue
                 break   
             case "password":
-                user_data, password = change_password(users_file, username, password)
+                user_data = change_password(users_file, user_data)
             case "create":
                 creation_date = datetime.now()
                 create_task(creation_date, file)
