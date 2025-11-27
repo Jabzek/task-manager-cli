@@ -2,7 +2,7 @@ from time import sleep
 from datetime import datetime
 from action_on_profiles import create_profile, get_file, log_into_profile, delete_profile, change_password
 from action_on_tasks import create_task
-# To do: remove task, show tasks (with filtres), task status change, task edit, task history, 
+# To do: show tasks (with filtres), task edit 
 
 
 def managing_account(user_data, users_file):
