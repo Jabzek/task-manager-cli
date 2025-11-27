@@ -155,3 +155,14 @@ def create_task(creation_date, userfile):
 
     with open(userfile, "w") as f:
         json.dump(tasks, f, indent=2)
+
+
+def delete_task(task_status, task_index, user_file):
+    with open(user_file, "r") as f:
+        tasks = json.load(f)
+
+    tasks[task_status].pop(task_index)
+
+    with open(user_file, "w") as f:
+        json.dump(tasks, f, indent=2)
+    
