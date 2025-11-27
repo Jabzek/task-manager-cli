@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from task_manager import action_on_tasks
-from task_manager.action_on_tasks import get_date, create_task, Task, create_task_input
+from task_manager.action_on_tasks import get_date, create_task, Task, delete_task 
 
 @pytest.fixture
 def get_date_fixture(monkeypatch):
@@ -95,3 +95,84 @@ def test_create_task(create_task_fixture, monkeypatch, name, description, priori
         tasks = json.load(f)
 
     assert tasks[status][0] == test_task_dic
+
+
+@pytest.fixture
+def delete_task_fixture(monkeypatch, tmp_path):
+    monkeypatch.setattr("builtins.print", lambda *a, **kw: None)
+    user_file = tmp_path / "jacek.json"
+    user_file.touch()
+    tasks = {
+        "pending": [
+            {
+            "name": "Task2",
+            "description": "",
+            "priority": "not important",
+            "status": "pending",
+            "date_of_creation": "2025-11-27 19:13",
+            "deadline": "2029-12-12 12:15"
+            },
+            {
+            "name": "Task4",
+            "description": "",
+            "priority": "important",
+            "status": "pending",
+            "date_of_creation": "2025-11-27 19:14",
+            "deadline": "2026-01-02 03:04"
+            }
+        ],
+        "active": [
+            {
+            "name": "task1",
+            "description": "descripiton for task 1",
+            "priority": "important",
+            "status": "active",
+            "date_of_creation": "2025-11-27 19:12",
+            "deadline": "2026-12-12 12:12"
+            },
+            {
+            "name": "Task3",
+            "description": "Today is Thursday",
+            "priority": "urgent",
+            "status": "active",
+            "date_of_creation": "2025-11-27 19:13",
+            "deadline": "2025-12-31 23:59"
+            }
+        ],
+        "finished": [{
+            "name": "Task-1",
+            "description": "Today is Wednesday",
+            "priority": "urgent",
+            "status": "active",
+            "date_of_creation": "2025-11-27 19:13",
+            "deadline": "2025-11-31 23:59"
+            }]
+        }
+
+    with open(user_file, "w") as f:
+        json.dump(tasks, f)
+
+    return user_file
+
+
+@pytest.mark.parametrize("task_status, task_index", [
+    ("pending", 0),
+    ("pending", 1),
+    ("active", 0),
+    ("active", 1),
+    ("finished", 0)
+])
+
+
+def test_delete_task(delete_task_fixture, task_status, task_index):
+    user_file = delete_task_fixture
+    with open(user_file, "r") as f:
+        tasks = json.load(f)
+    tasks[task_status].pop(task_index)
+    
+    delete_task(task_status, task_index, user_file)
+
+    with open(user_file, "r") as f:
+        new_tasks = json.load(f)
+
+    assert tasks == new_tasks
