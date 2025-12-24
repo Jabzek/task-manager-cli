@@ -1,3 +1,4 @@
+from textual.app import App
 from time import sleep
 from datetime import datetime
 from action_on_profiles import create_profile, get_file, log_into_profile, delete_profile, change_password
@@ -66,6 +67,13 @@ def main():
     while not exit_program:
         exit_program = action(users_file)
 
+class Main(App):
+    def on_key(self, event):
+        if event.key.isdecimal():
+            self.screen.styles.background = "darkblue"
+
+
 
 if __name__ == "__main__":
-    main()
+    app = Main()
+    app.run()
